@@ -1,5 +1,14 @@
 {
   "dependencies": {
     "discord.js": "^14.18.0"
+  },
+  "name": "discord-split-bill-bot",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "repository": "https://github.com/mhmakelvin/discord-split-bill-bot.git",
+  "author": "Kelvin Ma",
+  "license": "MIT",
+  "scripts": {
+    "start": "cd src && node deploy.js && node app.js"
   }
 }
