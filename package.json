@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "discord.js": "^14.18.0"
+    "discord.js": "^14.18.0",
+    "prettier": "^3.5.3"
   },
   "name": "discord-split-bill-bot",
   "version": "1.0.0",
@@ -9,6 +10,7 @@
   "author": "Kelvin Ma",
   "license": "MIT",
   "scripts": {
-    "start": "cd src && node deploy.js && node app.js"
+    "start": "cd src && node deploy.js && node app.js",
+    "format": "prettier --write src"
   }
 }
