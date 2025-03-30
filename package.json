@@ -13,5 +13,6 @@
   "scripts": {
     "start": "cd src && node deploy.js && node app.js",
     "format": "prettier --write src"
-  }
+  },
+  "type": "module"
 }

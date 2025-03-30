@@ -1,3 +1,1 @@
-const currencyList = ["JPY", "HKD", "USD"];
-
-module.exports = { currencyList };
+export const currencyList = ["JPY", "HKD", "USD"];

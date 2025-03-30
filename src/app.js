@@ -1,27 +1,26 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const {
+import * as fs from 'fs';
+import * as path from 'path';
+import {
   Client,
   Collection,
   Events,
   GatewayIntentBits,
   MessageFlags,
-} = require("discord.js");
-const { token } = require("../config.json");
+} from "discord.js"
+import * as config from "../config.json" with { type: "json" };
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.commands = new Collection();
-const commandFolderPath = path.join(__dirname, "commands");
+const commandFolderPath = path.join(path.resolve(), "commands");
 const commandFiles = fs
   .readdirSync(commandFolderPath)
   .filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
   const filePath = path.join(commandFolderPath, file);
-  const command = require(filePath);
-  // Set a new item in the Collection with the key as the command name and the value as the exported module
-  if ("data" in command && "execute" in command) {
+  const command = await import(filePath);
+  if (command.data && command.execute) {
     client.commands.set(command.data.name, command);
     console.log(`${command.data.name} command added.`);
   } else {
@@ -59,4 +58,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-client.login(token);
+client.login(config.default.token);

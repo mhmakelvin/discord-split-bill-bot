@@ -1,19 +1,19 @@
-const { REST, Routes } = require("discord.js");
-const { clientId, guildId, token } = require("../config.json");
-const fs = require("node:fs");
-const path = require("node:path");
+import { REST, Routes } from "discord.js"
+import * as config from "../config.json" with { type: "json" };
+import * as fs from 'fs';
+import * as path from 'path';
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier
-const commandFolderPath = path.join(__dirname, "commands");
+const commandFolderPath = path.join(path.resolve(), "commands");
 const commandFiles = fs
   .readdirSync(commandFolderPath)
   .filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
   const filePath = path.join(commandFolderPath, file);
-  const command = require(filePath);
-  if ("data" in command && "execute" in command) {
+  const command = await import(filePath);
+  if (command.data && command.execute) {
     commands.push(command.data.toJSON());
   } else {
     console.log(
@@ -22,8 +22,7 @@ for (const file of commandFiles) {
   }
 }
 
-// Construct and prepare an instance of the REST module
-const rest = new REST().setToken(token);
+const rest = new REST().setToken(config.default.token);
 
 // and deploy your commands!
 (async () => {
@@ -34,7 +33,7 @@ const rest = new REST().setToken(token);
 
     // The put method is used to fully refresh all commands in the guild with the current set
     const data = await rest.put(
-      Routes.applicationGuildCommands(clientId, guildId),
+      Routes.applicationGuildCommands(config.default.clientId, config.default.guildId),
       { body: commands },
     );
 

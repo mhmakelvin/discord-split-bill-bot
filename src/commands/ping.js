@@ -1,16 +1,11 @@
-const { SlashCommandBuilder } = require("discord.js");
+import { SlashCommandBuilder } from "discord.js"
 
-const command = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName("ping")
   .setDescription("Provides information about the user.");
 
-const action = async (interaction) => {
+export async function execute(interaction) {
   await interaction.reply(
     `This command was run by ${interaction.user.username}, who joined on ${interaction.member.joinedAt}.`,
   );
-};
-
-module.exports = {
-  data: command,
-  execute: action,
 };
