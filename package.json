@@ -10,7 +10,7 @@
   "author": "Kelvin Ma",
   "license": "MIT",
   "scripts": {
-    "start": "cd src && node deploy.js && node app.js",
+    "local": "STAGE=local cd src && node deploy.js && node app.js",
     "format": "prettier --write src"
   },
   "type": "module"
