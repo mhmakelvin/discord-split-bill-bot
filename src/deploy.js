@@ -1,5 +1,5 @@
 import { REST, Routes } from "discord.js"
-import * as config from "../config.json" with { type: "json" };
+import { discordConfig } from "../config.js"
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -22,7 +22,7 @@ for (const file of commandFiles) {
   }
 }
 
-const rest = new REST().setToken(config.default.token);
+const rest = new REST().setToken(discordConfig.token);
 
 // and deploy your commands!
 (async () => {
@@ -33,7 +33,7 @@ const rest = new REST().setToken(config.default.token);
 
     // The put method is used to fully refresh all commands in the guild with the current set
     const data = await rest.put(
-      Routes.applicationGuildCommands(config.default.clientId, config.default.guildId),
+      Routes.applicationGuildCommands(discordConfig.clientId, discordConfig.guildId),
       { body: commands },
     );
 

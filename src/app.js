@@ -1,17 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  Client,
-  Collection,
-  Events,
-  GatewayIntentBits,
-  MessageFlags,
-} from "discord.js"
-import * as config from "../config.json" with { type: "json" };
+import * as Discord from "discord.js"
+import { discordConfig } from "../config.js"
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds] });
 
-client.commands = new Collection();
+client.commands = new Discord.Collection();
 const commandFolderPath = path.join(path.resolve(), "commands");
 const commandFiles = fs
   .readdirSync(commandFolderPath)
@@ -30,7 +24,7 @@ for (const file of commandFiles) {
   }
 }
 
-client.on(Events.InteractionCreate, async (interaction) => {
+client.on(Discord.Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const command = interaction.client.commands.get(interaction.commandName);
@@ -58,4 +52,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-client.login(config.default.token);
+client.login(discordConfig.token);
+
