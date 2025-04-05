@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "discord.js": "^14.18.0",
+    "firebase-admin": "^13.2.0",
     "prettier": "^3.5.3"
   },
   "name": "discord-split-bill-bot",
@@ -10,7 +11,10 @@
   "author": "Kelvin Ma",
   "license": "MIT",
   "scripts": {
-    "local": "STAGE=local cd src && node deploy.js && node app.js",
+    "start:local": "yarn emulator & STAGE=local yarn start",
+    "start:prd": "STAGE=prd yarn start",
+    "start": "cd src && node deploy.js && node app.js",
+    "emulator": "mkdir -p firestore/data && firebase emulators:start --import firestore/data --export-on-exit",
     "format": "prettier --write src"
   },
   "type": "module"

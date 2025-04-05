@@ -1,9 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as Discord from "discord.js"
-import { discordConfig } from "../config.js"
+import * as fs from "fs";
+import * as path from "path";
+import * as Discord from "discord.js";
+import { discordConfig } from "../config.js";
 
-const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds] });
+const client = new Discord.Client({
+  intents: [Discord.GatewayIntentBits.Guilds],
+});
 
 client.commands = new Discord.Collection();
 const commandFolderPath = path.join(path.resolve(), "commands");
@@ -53,4 +55,3 @@ client.on(Discord.Events.InteractionCreate, async (interaction) => {
 });
 
 client.login(discordConfig.token);
-

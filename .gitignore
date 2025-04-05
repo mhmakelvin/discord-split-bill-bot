@@ -1,2 +1,24 @@
 node_modules
 config.js
+*.log
+
+# Firebase build and deployment files
+.firebaserc
+
+# Firebase Hosting
+/firebase.json
+*.cache
+hosting/.cache
+
+# Firebase Functions
+/functions/node_modules/
+/functions/.env
+/functions/package-lock.json
+
+# Firebase Emulators
+/firebase-*.zip
+/.firebase/
+/emulator-ui/
+
+# Firebase Emulator Data
+/firestore/data
