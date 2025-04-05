@@ -19,3 +19,6 @@ hosting/.cache
 /firebase-*.zip
 /.firebase/
 /emulator-ui/
+
+# Firebase Emulator Data
+/firestore/data
