@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from "discord.js";
-import { addPermittedUser } from "../service/user_service.js";
+import { activateUser } from "../service/user_service.js";
 
 export const data = new SlashCommandBuilder()
-  .setName("add_user")
+  .setName("activate")
   .setDescription("Add yourself into SplitBill Bot user list")
   .addStringOption((option) =>
     option
@@ -16,7 +16,7 @@ export async function execute(interaction) {
   const displayName = interaction.options.getString("name");
 
   try {
-    await addPermittedUser(userToAdd.username, displayName);
+    await activateUser(userToAdd.username, displayName);
     interaction.reply(
       `User ${userToAdd} successfully added as ${displayName || userToAdd.username}`,
     );
