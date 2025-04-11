@@ -11,7 +11,7 @@ export async function isPermittedUser(discordId) {
   return !existingUser.empty;
 }
 
-export async function addPermittedUser(discordId, name) {
+export async function activateUser(discordId, name) {
   try {
     const usersCollection = db.collection("users");
 
