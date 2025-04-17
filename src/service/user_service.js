@@ -1,6 +1,6 @@
 import { db } from "../firebase/firebase.js";
 
-export async function isPermittedUser(discordId) {
+export async function isActiveUser(discordId) {
   const usersCollection = db.collection("users");
 
   const existingUser = await usersCollection
