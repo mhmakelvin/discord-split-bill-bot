@@ -36,11 +36,16 @@ export async function getTransactionsPaidForUser(serverId, userId) {
   return txn.docs;
 }
 
-export async function cancelTransaction(messageId) {
+export async function cancelTransaction(messageId, userId) {
   const txn = await getTransaction(messageId);
 
   if (txn === null) {
     throw new Error(`Transaction with ${messageId} not found`);
+  }
+
+  const author = await txn.data().author.get();
+  if (author.data().discordId !== userId) {
+    throw new Error(`Only author can cancel the transaction`);
   }
 
   if (txn.data().isCancelled) {
