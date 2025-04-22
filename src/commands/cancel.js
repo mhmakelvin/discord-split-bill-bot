@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { deleteTransaction } from "../service/transaction_service.js";
+import { cancelTransaction } from "../service/transaction_service.js";
 
 export const data = new SlashCommandBuilder()
   .setName("cancel")
@@ -11,7 +11,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const txnId = interaction.options.getString("id");
   try {
-    await deleteTransaction(txnId);
+    await cancelTransaction(txnId);
     await interaction.reply(`Cancelled transaction ${txnId} successfully`);
   } catch (e) {
     interaction.reply({

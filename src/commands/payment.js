@@ -1,6 +1,10 @@
-import { SlashCommandBuilder, MessageFlags } from "discord.js"
-import { currencyList } from "../service/currency_service.js"
-import { isPermittedUser } from "../service/user_service.js"
+import { SlashCommandBuilder } from "discord.js";
+import { currencyList } from "../service/currency_service.js";
+import {
+  addTransaction,
+  deleteTransaction,
+} from "../service/transaction_service.js";
+import { updateTransactionMessage } from "../service/message_service.js";
 
 const currencyOptions = [];
 for (const currency of currencyList) {
@@ -31,24 +35,48 @@ export const data = new SlashCommandBuilder()
       .setDescription("Currency")
       .setRequired(true)
       .addChoices(currencyOptions),
+  )
+  .addStringOption((option) =>
+    option
+      .setName("description")
+      .setDescription("Description")
+      .setRequired(false),
   );
 
 export async function execute(interaction) {
+  const serverId = interaction.commandGuildId;
+  const author = interaction.user;
   const fromUser = interaction.options.getUser("from");
   const toUser = interaction.options.getUser("to");
   const amount = interaction.options.getNumber("amount");
   const currency = interaction.options.getString("currency");
+  const description = interaction.options.getString("description");
 
-  /*
-  if (
-    !isPermittedUser(fromUser.username) ||
-    !isPermittedUser(toUser.username)
-  ) {
-    interaction.reply({ content: "Invalid user", flags : MessageFlags.Ephemeral });
-    return;
+  const resp = await interaction.reply({
+    content: "Request received",
+    withResponse: true,
+  });
+  const msg = resp.resource.message;
+
+  try {
+    await addTransaction(
+      serverId,
+      author,
+      fromUser,
+      [toUser],
+      amount,
+      currency,
+      description || "",
+      msg.id,
+    );
+
+    msg.react("✅");
+    await updateTransactionMessage(interaction.client, msg.id);
+
+    msg.pin();
+  } catch (e) {
+    console.log(e);
+    deleteTransaction(msg.id);
+    msg.edit(`Error occurred when processing request: ${e.message}`);
   }
-    */
-
-  const msg = await interaction.reply("Request received");
-  console.log(msg)
-};
+}
