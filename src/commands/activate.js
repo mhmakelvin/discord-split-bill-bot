@@ -16,7 +16,11 @@ export async function execute(interaction) {
   const displayName = interaction.options.getString("name");
 
   try {
-    await activateUser(interaction.commandGuildId, userToAdd.username, displayName);
+    await activateUser(
+      interaction.commandGuildId,
+      userToAdd.username,
+      displayName,
+    );
     interaction.reply(
       `User ${userToAdd} successfully added as ${displayName || userToAdd.username}`,
     );
