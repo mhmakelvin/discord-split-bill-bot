@@ -100,6 +100,7 @@ export async function updateTransactionMessage(client, messageId) {
     if (pendingUsers.length === 0) {
       await txn.ref.update({ ...txnData, isApproved: true });
       msg.edit({ content: "All users have approved the transaction." });
+      msg.unpin();
     }
   } catch (e) {
     console.log(e);
