@@ -14,6 +14,28 @@ export async function getTransaction(messageId) {
   return txn.docs[0];
 }
 
+export async function getTransactionsPaidByUser(serverId, userId) {
+  const userData = await getUser(serverId, userId);
+
+  const txn = await db
+    .collection("transactions")
+    .where("lender", "==", userData.ref)
+    .get();
+
+  return txn.docs;
+}
+
+export async function getTransactionsPaidForUser(serverId, userId) {
+  const userData = await getUser(serverId, userId);
+
+  const txn = await db
+    .collection("transactions")
+    .where("borrowers", "array-contains", userData.ref)
+    .get();
+
+  return txn.docs;
+}
+
 export async function cancelTransaction(messageId) {
   const txn = await getTransaction(messageId);
 
