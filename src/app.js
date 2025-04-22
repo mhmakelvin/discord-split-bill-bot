@@ -2,9 +2,19 @@ import * as fs from "fs";
 import * as path from "path";
 import * as Discord from "discord.js";
 import { discordConfig } from "../config.js";
+import { updateTransactionMessage } from "./service/message_service.js";
 
 const client = new Discord.Client({
-  intents: [Discord.GatewayIntentBits.Guilds],
+  intents: [
+    Discord.GatewayIntentBits.Guilds,
+    Discord.GatewayIntentBits.GuildMessages,
+    Discord.GatewayIntentBits.GuildMessageReactions,
+  ],
+  partials: [
+    Discord.Partials.Message,
+    Discord.Partials.Channel,
+    Discord.Partials.Reaction,
+  ],
 });
 
 client.commands = new Discord.Collection();
@@ -52,6 +62,10 @@ client.on(Discord.Events.InteractionCreate, async (interaction) => {
       });
     }
   }
+});
+
+client.on(Discord.Events.MessageReactionAdd, async (reaction, user) => {
+  updateTransactionMessage(client, reaction.message.id);
 });
 
 client.login(discordConfig.token);
