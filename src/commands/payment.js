@@ -5,6 +5,7 @@ import {
   deleteTransaction,
 } from "../service/transaction_service.js";
 import { updateTransactionMessage } from "../service/message_service.js";
+import { approvedEmoji } from "../constants.js";
 
 const currencyOptions = [];
 for (const currency of currencyList) {
@@ -70,7 +71,7 @@ export async function execute(interaction) {
       msg.id,
     );
 
-    msg.react("✅");
+    msg.react(approvedEmoji);
     await updateTransactionMessage(interaction.client, msg.id);
 
     msg.pin();
