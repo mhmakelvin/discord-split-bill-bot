@@ -64,6 +64,8 @@ export async function updateTransactionMessage(client, messageId) {
     approvedUsers = [...new Set(approvedUsers)];
     pendingUsers = [...new Set(pendingUsers)];
 
+    const amountPerPerson = txnData.amount / txnData.borrowers.length;
+
     const embed = new EmbedBuilder()
       .setTitle("Transaction Request")
       .setAuthor({ name: author.name })
@@ -77,7 +79,7 @@ export async function updateTransactionMessage(client, messageId) {
           name: "Paid to",
           value: borrowers.map((user) => user.name).join(", "),
         },
-        { name: "Amount", value: `${txnData.amount} ${txnData.currency}` },
+        { name: "Amount", value: `${txnData.amount} ${txnData.currency} (${amountPerPerson} ${txnData.currency} per person)` },
         {
           name: "Approved",
           value: `${approvedUsers.length} ${
