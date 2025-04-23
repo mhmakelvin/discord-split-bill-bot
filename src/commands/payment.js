@@ -71,6 +71,9 @@ export async function execute(interaction) {
       msg.id,
     );
 
+    msg.edit(
+      `Transaction request from ${fromUser} to ${toUser} for ${amount} ${currency}\n Please confirm by reacting with ${approvedEmoji}`,
+    );
     msg.react(approvedEmoji);
     msg.pin();
   } catch (e) {
