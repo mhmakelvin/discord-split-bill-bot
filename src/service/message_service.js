@@ -79,7 +79,10 @@ export async function updateTransactionMessage(client, messageId) {
           name: "Paid to",
           value: borrowers.map((user) => user.name).join(", "),
         },
-        { name: "Amount", value: `${txnData.amount} ${txnData.currency} (${amountPerPerson} ${txnData.currency} per person)` },
+        {
+          name: "Amount",
+          value: `${txnData.amount} ${txnData.currency} (${amountPerPerson} ${txnData.currency} per person)`,
+        },
         {
           name: "Approved",
           value: `${approvedUsers.length} ${
@@ -109,16 +112,18 @@ export async function updateTransactionMessage(client, messageId) {
   }
 }
 
-export async function updateTransactionMessageForCancellation(client, messageId) {
-    try {
-      const msg = await getMessageForTransactionId(client, messageId);
+export async function updateTransactionMessageForCancellation(
+  client,
+  messageId,
+) {
+  try {
+    const msg = await getMessageForTransactionId(client, messageId);
 
-      msg.edit({
-        content: `Transaction has been cancelled on ${new Date().toUTCString()}`,
-      });
-      msg.unpin();
-    } catch (e) {
-        console.log(e);
-      }
-    
+    msg.edit({
+      content: `Transaction has been cancelled on ${new Date().toUTCString()}`,
+    });
+    msg.unpin();
+  } catch (e) {
+    console.log(e);
+  }
 }
