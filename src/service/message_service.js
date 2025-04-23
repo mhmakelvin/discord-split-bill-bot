@@ -108,3 +108,17 @@ export async function updateTransactionMessage(client, messageId) {
     console.log(e);
   }
 }
+
+export async function updateTransactionMessageForCancellation(client, messageId) {
+    try {
+      const msg = await getMessageForTransactionId(client, messageId);
+
+      msg.edit({
+        content: `Transaction has been cancelled on ${new Date().toUTCString()}`,
+      });
+      msg.unpin();
+    } catch (e) {
+        console.log(e);
+      }
+    
+}

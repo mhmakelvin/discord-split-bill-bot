@@ -56,7 +56,7 @@ export async function cancelTransaction(messageId, userId) {
     throw new Error(`Transaction ${messageId} is already processed`);
   }
 
-  docRef.update({ isCancelled: true });
+  txn.ref.update({ isCancelled: true });
 }
 
 export async function addTransaction(
@@ -123,9 +123,7 @@ export async function addTransaction(
 export async function deleteTransaction(messageId) {
   const txn = await getTransaction(messageId);
 
-  if (txn === null) {
-    throw new Error(`Transaction with ID ${messageId} not found`);
-  }
+  if (txn === null) return;
 
   txn.ref.delete();
 }
