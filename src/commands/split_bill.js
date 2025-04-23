@@ -5,7 +5,10 @@ import {
 } from "discord.js";
 import { isActiveUser } from "../service/user_service.js";
 import { currencyList } from "../service/currency_service.js";
-import { addTransaction, deleteTransaction } from "../service/transaction_service.js";
+import {
+  addTransaction,
+  deleteTransaction,
+} from "../service/transaction_service.js";
 import { approvedEmoji } from "../constants.js";
 
 const currencyOptions = [];
@@ -33,15 +36,15 @@ export const data = new SlashCommandBuilder()
       .setRequired(false),
   );
 
-
 export async function execute(interaction) {
   const serverId = interaction.commandGuildId;
 
   if (!isActiveUser(serverId, interaction.user.username)) {
-    await interaction.reply( `${interaction.user} is not activated for Split Bill Bot in this server`,
- );
+    await interaction.reply(
+      `${interaction.user} is not activated for Split Bill Bot in this server`,
+    );
     return;
-}
+  }
 
   const userSelect = new UserSelectMenuBuilder()
     .setCustomId("users")
@@ -72,7 +75,7 @@ export async function execute(interaction) {
 
     if (inactiveUserList.length > 0) {
       await interaction.editReply({
-        content:       `${inactiveUserList} is not activated for Split Bill Bot in this server`,
+        content: `${inactiveUserList} is not activated for Split Bill Bot in this server`,
 
         components: [],
       });
@@ -84,8 +87,8 @@ export async function execute(interaction) {
     const description = interaction.options.getString("description");
 
     const cnt = response.users.size;
-    amount = amount + (cnt - amount % cnt) % cnt; // Round up amount to nearest multiple of cnt
-      
+    amount = amount + ((cnt - (amount % cnt)) % cnt); // Round up amount to nearest multiple of cnt
+
     await addTransaction(
       serverId,
       interaction.user,
@@ -105,8 +108,11 @@ export async function execute(interaction) {
       components: [],
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     deleteTransaction(msg.id);
-    await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
+    await interaction.editReply({
+      content: "Confirmation not received within 1 minute, cancelling",
+      components: [],
+    });
   }
 }
