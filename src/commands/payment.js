@@ -72,8 +72,6 @@ export async function execute(interaction) {
     );
 
     msg.react(approvedEmoji);
-    await updateTransactionMessage(interaction.client, msg.id);
-
     msg.pin();
   } catch (e) {
     console.log(e);
