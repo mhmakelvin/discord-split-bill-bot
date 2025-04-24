@@ -70,6 +70,10 @@ export async function addTransaction(
   channelId,
   messageId,
 ) {
+  if (amount <= 0) {
+    throw new Error("Please input valid amount (Greater than 0)");
+  }
+
   const inactiveUserList = [];
 
   const authorData = await getUser(serverId, author.id);
