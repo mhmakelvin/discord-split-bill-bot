@@ -7,11 +7,17 @@ import { getUser } from "../service/user_service.js";
 
 export const data = new SlashCommandBuilder()
   .setName("profile")
-  .setDescription("Provides information about the user.");
+  .setDescription("Provides information about the user.")
+  .addMentionableOption((option) =>
+    option
+      .setName("user")
+      .setDescription("Mention who to get profile for")
+      .setRequired(true),
+  );
 
 export async function execute(interaction) {
   try {
-    const user = interaction.user;
+    const user = interaction.options.getUser("user") || interaction.user;
     const userData = await getUser(interaction.commandGuildId, user.username);
 
     if (userData === null) {
