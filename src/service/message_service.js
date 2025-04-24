@@ -41,7 +41,7 @@ export async function updateTransactionMessage(client, messageId) {
     let pendingUsers = [];
 
     if (
-      reactedUsers.values().some((user) => user.username === lender.discordId)
+      reactedUsers.values().some((user) => user.id === lender.userId)
     ) {
       approvedUsers.push(lender.name);
     } else {
@@ -52,7 +52,7 @@ export async function updateTransactionMessage(client, messageId) {
       if (
         reactedUsers
           .values()
-          .some((user) => user.username === borrower.discordId)
+          .some((user) => user.id === borrower.userId)
       ) {
         approvedUsers.push(borrower.name);
       } else {

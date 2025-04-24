@@ -18,7 +18,7 @@ export async function execute(interaction) {
   try {
     await activateUser(
       interaction.commandGuildId,
-      userToAdd.username,
+      userToAdd,
       displayName,
     );
     interaction.reply(

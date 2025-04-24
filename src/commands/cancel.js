@@ -12,7 +12,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const txnId = interaction.options.getString("id");
   try {
-    await cancelTransaction(txnId, interaction.user.username);
+    await cancelTransaction(txnId, interaction.user.id);
     await updateTransactionMessageForCancellation(interaction.client, txnId);
     await interaction.reply(`Cancelled transaction ${txnId} successfully`);
   } catch (e) {

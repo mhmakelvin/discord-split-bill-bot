@@ -1,10 +1,10 @@
 import { db } from "../firebase/firebase.js";
 
-export async function getUser(serverId, discordId) {
+export async function getUser(serverId, userId) {
   const usersCollection = db.collection("users");
 
   const existingUser = await usersCollection
-    .where("discordId", "==", discordId)
+    .where("userId", "==", userId)
     .where("serverId", "==", serverId)
     .get();
 
@@ -13,28 +13,28 @@ export async function getUser(serverId, discordId) {
   return existingUser.docs[0];
 }
 
-export async function isActiveUser(serverId, discordId) {
-  const user = await getUser(serverId, discordId);
+export async function isActiveUser(serverId, userId) {
+  const user = await getUser(serverId, userId);
 
   return user !== null && user.data().active;
 }
 
-export async function activateUser(serverId, discordId, name) {
+export async function activateUser(serverId, user, name) {
   try {
-    const user = await getUser(serverId, discordId);
+    const userData = await getUser(serverId, user.id);
 
-    if (user !== null) {
-      user.ref.update({
+    if (userData !== null) {
+      userData.ref.update({
         serverId: serverId,
-        discordId: discordId,
-        name: name || discordId,
+        userId: user.id,
+        name: name || user.username,
         active: true,
       });
     } else {
       const docRef = await db.collection("users").add({
         serverId: serverId,
-        discordId: discordId,
-        name: name || discordId,
+        userId: user.id,
+        name: name || user.username,
         active: true,
       });
     }

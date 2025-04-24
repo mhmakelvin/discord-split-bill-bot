@@ -18,7 +18,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   try {
     const user = interaction.options.getUser("user") || interaction.user;
-    const userData = await getUser(interaction.commandGuildId, user.username);
+    const userData = await getUser(interaction.commandGuildId, user.id);
 
     if (userData === null) {
       throw new Error(
@@ -28,11 +28,11 @@ export async function execute(interaction) {
 
     const debitTransactions = await getTransactionsPaidByUser(
       interaction.commandGuildId,
-      user.username,
+      user.id,
     );
     const creditTransactions = await getTransactionsPaidForUser(
       interaction.commandGuildId,
-      user.username,
+      user.id,
     );
 
     const balance = new Map();

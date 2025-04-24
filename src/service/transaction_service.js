@@ -44,7 +44,7 @@ export async function cancelTransaction(messageId, userId) {
   }
 
   const author = await txn.data().author.get();
-  if (author.data().discordId !== userId) {
+  if (author.data().id !== userId) {
     throw new Error(`Only author can cancel the transaction`);
   }
 
@@ -72,21 +72,25 @@ export async function addTransaction(
 ) {
   const inactiveUserList = [];
 
-  const authorData = await getUser(serverId, author.username);
+  const authorData = await getUser(serverId, author.id);
   if (authorData === null || authorData.data().active === false) {
     throw new Error(
       `${inactiveUserList} is not activated for Split Bill Bot in this server`,
     );
   }
 
-  const paidByUserData = await getUser(serverId, paidByUser.username);
+  const paidByUserData = await getUser(serverId, paidByUser.id);
   if (paidByUserData === null || paidByUserData.data().active === false) {
     inactiveUserList.push(paidByUser);
   }
 
   const paidForUserRefList = [];
   for (const user of paidForUserList) {
-    const userData = await getUser(serverId, user.username);
+    if (user === null) {
+      throw new Error("Please input appropiate user for the transaction")
+    }
+
+    const userData = await getUser(serverId, user.id);
     if (userData === null || userData.data().active === false) {
       inactiveUserList.push(user);
     } else {

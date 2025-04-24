@@ -39,7 +39,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const serverId = interaction.commandGuildId;
 
-  if (!isActiveUser(serverId, interaction.user.username)) {
+  if (!isActiveUser(serverId, interaction.user.id)) {
     await interaction.reply(
       `${interaction.user} is not activated for Split Bill Bot in this server`,
     );
@@ -82,7 +82,7 @@ export async function execute(interaction) {
   try {
     const inactiveUserList = [];
     for (const user of mentionedUsers) {
-      const isActive = await isActiveUser(serverId, user.username);
+      const isActive = await isActiveUser(serverId, user.id);
       if (!isActive) {
         inactiveUserList.push(user);
       }
