@@ -1,15 +1,17 @@
 import { initializeApp, applicationDefault, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { firebaseConfig } from "../../config.js";
-import serviceAccount from "../../serviceAccountKey.json" with { type: "json" };
 
 let firebaseAdminApp;
 let db;
 
 if (process.env.STAGE === "prd") {
+  const serviceAccount = await import("../../serviceAccountKey.json", {
+    with: { type: "json" },
+  });
   firebaseAdminApp = initializeApp({
     projectId: firebaseConfig.projectId,
-    credential: cert(serviceAccount),
+    credential: cert(serviceAccount.default),
   });
   db = getFirestore(firebaseAdminApp);
 } else {
