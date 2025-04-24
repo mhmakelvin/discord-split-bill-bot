@@ -12,7 +12,7 @@ export const data = new SlashCommandBuilder()
     option
       .setName("user")
       .setDescription("Mention who to get profile for")
-      .setRequired(true),
+      .setRequired(false),
   );
 
 export async function execute(interaction) {
