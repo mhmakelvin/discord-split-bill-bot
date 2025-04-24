@@ -68,4 +68,8 @@ client.on(Discord.Events.MessageReactionAdd, async (reaction, user) => {
   updateTransactionMessage(client, reaction.message.id);
 });
 
+client.on(Discord.Events.MessageReactionRemove, async (reaction, user) => {
+  updateTransactionMessage(client, reaction.message.id);
+});
+
 client.login(discordConfig.token);
