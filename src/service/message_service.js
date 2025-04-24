@@ -66,7 +66,7 @@ export async function updateTransactionMessage(client, messageId) {
     const amountPerPerson = txnData.amount / txnData.borrowers.length;
 
     const embed = new EmbedBuilder()
-      .setTitle("Transaction Request")
+      .setTitle(txnData.description || "Transaction Request")
       .setAuthor({ name: author.name })
       .setFields(
         { name: "Transaction ID", value: msg.id },
