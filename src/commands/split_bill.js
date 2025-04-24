@@ -57,16 +57,31 @@ export async function execute(interaction) {
   const reply = await interaction.reply({
     content: "Select users:",
     components: [row],
+    ephemeral: true,
     withResponse: true,
   });
 
   const msg = reply.resource.message;
 
+  let mentionedUsers = [];
   try {
     const response = await msg.awaitMessageComponent({ time: 60_000 });
+    mentionedUsers = Array.from(response.users.values());
+  } catch (e) {
+    console.log(e);
+    await interaction.editReply({
+      content: "Confirmation not received within 1 minute, cancelling",
+      components: [],
+    });
+  }
 
+  const txnMsg = await interaction.followUp({
+    content: `Creating Transaction`,
+  });
+
+  try {
     const inactiveUserList = [];
-    for (var [id, user] of response.users.entries()) {
+    for (const user of mentionedUsers) {
       const isActive = await isActiveUser(serverId, user.username);
       if (!isActive) {
         inactiveUserList.push(user);
@@ -74,10 +89,8 @@ export async function execute(interaction) {
     }
 
     if (inactiveUserList.length > 0) {
-      await interaction.editReply({
+      await txnMsg.edit({
         content: `${inactiveUserList} is not activated for Split Bill Bot in this server`,
-
-        components: [],
       });
       return;
     }
@@ -86,34 +99,32 @@ export async function execute(interaction) {
     const currency = interaction.options.getString("currency");
     const description = interaction.options.getString("description");
 
-    const cnt = response.users.size;
+    const cnt = mentionedUsers.length;
     amount = amount + ((cnt - (amount % cnt)) % cnt); // Round up amount to nearest multiple of cnt
 
     await addTransaction(
       serverId,
       interaction.user,
       interaction.user,
-      response.users.values(),
+      mentionedUsers,
       amount,
       currency,
       description || "",
       interaction.channel.id,
-      msg.id,
+      txnMsg.id,
     );
 
-    msg.react(approvedEmoji);
-    msg.pin();
+    txnMsg.edit(
+      `${interaction.user} has initiated a transaction of ${amount} ${currency} splitting between ${mentionedUsers}\n Please confirm by reacting with ${approvedEmoji}`,
+    );
+    txnMsg.react(approvedEmoji);
+    txnMsg.pin();
 
-    await interaction.editReply({
-      content: `${interaction.user} has initiated a transaction of ${amount} ${currency} splitting between ${Array.from(response.users.values())}\n Please confirm by reacting with ${approvedEmoji}`,
-      components: [],
-    });
+    interaction.deleteReply();
   } catch (e) {
-    console.log(e);
-    deleteTransaction(msg.id);
-    await interaction.editReply({
-      content: "Confirmation not received within 1 minute, cancelling",
-      components: [],
+    deleteTransaction(txnMsg.id);
+    await txnMsg.edit({
+      content: "Error when creating transaction: " + e.message,
     });
   }
 }
