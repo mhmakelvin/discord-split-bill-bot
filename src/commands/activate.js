@@ -16,6 +16,11 @@ export async function execute(interaction) {
   const displayName = interaction.options.getString("name");
 
   try {
+    if (/^.+\<\@[0-9]+\>$/.test(displayName)) {
+      interaction.reply("Invalid display name. Please try not to use mentionable as display name");
+      return;
+    }
+
     await activateUser(
       interaction.commandGuildId,
       userToAdd,
