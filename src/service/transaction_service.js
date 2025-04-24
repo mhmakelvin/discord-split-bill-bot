@@ -74,6 +74,16 @@ export async function addTransaction(
     throw new Error("Please input valid amount (Greater than 0)");
   }
 
+  if (/^.*\<((@(&)?)|#)[0-9]+\>.*$/.test(description)) {
+    throw new Error("Invalid description. Please try not to use mentionable as display name");
+    return;
+  }
+
+  if (description === "@here" || description === "@everyone") {
+    throw new Error("Invalid description. Please try not to use mentionable as display name");
+    return;
+  }
+
   const inactiveUserList = [];
 
   const authorData = await getUser(serverId, author.id);

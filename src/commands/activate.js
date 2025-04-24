@@ -16,8 +16,18 @@ export async function execute(interaction) {
   const displayName = interaction.options.getString("name");
 
   try {
-    if (/^.+\<\@[0-9]+\>$/.test(displayName)) {
+    if (/^.*\<((@(&)?)|#)[0-9]+\>.*$/.test(displayName)) {
       interaction.reply("Invalid display name. Please try not to use mentionable as display name");
+      return;
+    }
+
+    if (displayName === "@here" || displayName === "@everyone") {
+      interaction.reply("Invalid display name. Please try not to use mentionable as display name");
+      return;
+    }
+
+    if (displayName !== null && displayName.length > 256) {
+      interaction.reply("Invalid display name. Please enter a string less than 256 characters");
       return;
     }
 
