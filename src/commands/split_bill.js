@@ -97,6 +97,7 @@ export async function execute(interaction) {
       amount,
       currency,
       description || "",
+      interaction.channel.id,
       msg.id,
     );
 

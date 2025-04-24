@@ -9,15 +9,14 @@ export async function getMessageForTransactionId(client, messageId) {
     throw new Error(`Transaction with ${messageId} not found`);
   }
 
-  for (var [channelId, value] of client.channels.cache) {
+  const channelId = docRef.data().channelId;
+
+  try {
     const channel = await client.channels.fetch(channelId);
+    const msg = await channel.messages.fetch(messageId);
 
-    try {
-      const msg = await channel.messages.fetch(messageId);
-
-      return msg;
-    } catch (e) {}
-  }
+    return msg;
+  } catch (e) {}
 }
 
 export async function updateTransactionMessage(client, messageId) {

@@ -67,6 +67,7 @@ export async function addTransaction(
   amount,
   currency,
   description,
+  channelId,
   messageId,
 ) {
   const inactiveUserList = [];
@@ -109,6 +110,7 @@ export async function addTransaction(
       amount: amount,
       currency: currency,
       description: description,
+      channelId: channelId,
       messageId: messageId,
       createdAt: new Date(),
       isApproved: false,
