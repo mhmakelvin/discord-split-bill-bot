@@ -11,7 +11,13 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
   const txnId = interaction.options.getString("id");
+  
   try {
+    if (!/^[0-9]+$/.test(txnId)) {
+      interaction.reply("Invalid transaction ID. It should be a number");
+      return;
+    }
+
     await cancelTransaction(txnId, interaction.user.id);
     await updateTransactionMessageForCancellation(interaction.client, txnId);
     await interaction.reply(`Cancelled transaction ${txnId} successfully`);
