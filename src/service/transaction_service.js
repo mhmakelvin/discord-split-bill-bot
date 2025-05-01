@@ -44,7 +44,7 @@ export async function cancelTransaction(messageId, userId) {
   }
 
   const author = await txn.data().author.get();
-  if (author.data().id !== userId) {
+  if (author.data().userId !== userId) {
     throw new Error(`Only author can cancel the transaction`);
   }
 
@@ -93,6 +93,9 @@ export async function addTransaction(
     );
   }
 
+  if (paidByUser === null) {
+    throw new Error("Please input appropiate user for the transaction")
+  }
   const paidByUserData = await getUser(serverId, paidByUser.id);
   if (paidByUserData === null || paidByUserData.data().active === false) {
     inactiveUserList.push(paidByUser);
