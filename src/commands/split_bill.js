@@ -70,9 +70,10 @@ export async function execute(interaction) {
   } catch (e) {
     console.log(e);
     await interaction.editReply({
-      content: "Confirmation not received within 1 minute, cancelling",
+      content: "User selection not received within 1 minute, cancelling",
       components: [],
     });
+    return;
   }
 
   const txnMsg = await interaction.followUp({
