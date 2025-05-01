@@ -4,7 +4,6 @@ import {
   addTransaction,
   deleteTransaction,
 } from "../service/transaction_service.js";
-import { updateTransactionMessage } from "../service/message_service.js";
 import { approvedEmoji } from "../constants.js";
 
 const currencyOptions = [];
@@ -13,18 +12,18 @@ for (const currency of currencyList) {
 }
 
 export const data = new SlashCommandBuilder()
-  .setName("payment")
-  .setDescription("Add a direct payment between 2 users")
+  .setName("settlement")
+  .setDescription("Add a direct settlement between 2 users")
   .addMentionableOption((option) =>
     option
       .setName("from")
-      .setDescription("Mention who are paying")
+      .setDescription("Mention who are giving money")
       .setRequired(true),
   )
   .addMentionableOption((option) =>
     option
       .setName("to")
-      .setDescription("Mention who are recieveing the payment")
+      .setDescription("Mention who are recieveing money")
       .setRequired(true),
   )
   .addNumberOption((option) =>
