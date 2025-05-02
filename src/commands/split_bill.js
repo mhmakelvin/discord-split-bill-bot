@@ -34,15 +34,35 @@ export const data = new SlashCommandBuilder()
       .setName("description")
       .setDescription("Description")
       .setRequired(false),
+  )
+  .addMentionableOption((option) =>
+    option
+      .setName("paid_by")
+      .setDescription("Mention who are paying the bill")
+      .setRequired(false),
   );
 
 export async function execute(interaction) {
   const serverId = interaction.commandGuildId;
+  const payingUser =
+    interaction.options.getMentionable("paid_by") || interaction.user;
+  console.log(payingUser);
 
-  if (!isActiveUser(serverId, interaction.user.id)) {
-    await interaction.reply(
-      `${interaction.user} is not activated for Split Bill Bot in this server`,
-    );
+  const isAuthorActive = await isActiveUser(serverId, interaction.user.id);
+  if (!isAuthorActive) {
+    await interaction.reply({
+      content: `${interaction.user} is not activated for Split Bill Bot in this server`,
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const isPayingUserActive = await isActiveUser(serverId, payingUser.id);
+  if (!isPayingUserActive) {
+    await interaction.reply({
+      content: `${payingUser} is not activated for Split Bill Bot in this server`,
+      ephemeral: true,
+    });
     return;
   }
 
@@ -106,7 +126,7 @@ export async function execute(interaction) {
     await addTransaction(
       serverId,
       interaction.user,
-      interaction.user,
+      payingUser,
       mentionedUsers,
       amount,
       currency,
