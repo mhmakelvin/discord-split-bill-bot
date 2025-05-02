@@ -17,25 +17,27 @@ export async function execute(interaction) {
 
   try {
     if (/^.*\<((@(&)?)|#)[0-9]+\>.*$/.test(displayName)) {
-      interaction.reply("Invalid display name. Please try not to use mentionable as display name");
+      interaction.reply(
+        "Invalid display name. Please try not to use mentionable as display name",
+      );
       return;
     }
 
     if (displayName === "@here" || displayName === "@everyone") {
-      interaction.reply("Invalid display name. Please try not to use mentionable as display name");
+      interaction.reply(
+        "Invalid display name. Please try not to use mentionable as display name",
+      );
       return;
     }
 
     if (displayName !== null && displayName.length > 256) {
-      interaction.reply("Invalid display name. Please enter a string less than 256 characters");
+      interaction.reply(
+        "Invalid display name. Please enter a string less than 256 characters",
+      );
       return;
     }
 
-    await activateUser(
-      interaction.commandGuildId,
-      userToAdd,
-      displayName,
-    );
+    await activateUser(interaction.commandGuildId, userToAdd, displayName);
     interaction.reply(
       `User ${userToAdd} successfully added as ${displayName || userToAdd.username}`,
     );

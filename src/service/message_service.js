@@ -40,20 +40,14 @@ export async function updateTransactionMessage(client, messageId) {
     let approvedUsers = [];
     let pendingUsers = [];
 
-    if (
-      reactedUsers.values().some((user) => user.id === lender.userId)
-    ) {
+    if (reactedUsers.values().some((user) => user.id === lender.userId)) {
       approvedUsers.push(lender.name);
     } else {
       pendingUsers.push(lender.name);
     }
 
     for (const borrower of borrowers) {
-      if (
-        reactedUsers
-          .values()
-          .some((user) => user.id === borrower.userId)
-      ) {
+      if (reactedUsers.values().some((user) => user.id === borrower.userId)) {
         approvedUsers.push(borrower.name);
       } else {
         pendingUsers.push(borrower.name);

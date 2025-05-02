@@ -75,12 +75,16 @@ export async function addTransaction(
   }
 
   if (/^.*\<((@(&)?)|#)[0-9]+\>.*$/.test(description)) {
-    throw new Error("Invalid description. Please try not to use mentionable as display name");
+    throw new Error(
+      "Invalid description. Please try not to use mentionable as display name",
+    );
     return;
   }
 
   if (description === "@here" || description === "@everyone") {
-    throw new Error("Invalid description. Please try not to use mentionable as display name");
+    throw new Error(
+      "Invalid description. Please try not to use mentionable as display name",
+    );
     return;
   }
 
@@ -94,7 +98,7 @@ export async function addTransaction(
   }
 
   if (paidByUser === null) {
-    throw new Error("Please input appropiate user for the transaction")
+    throw new Error("Please input appropiate user for the transaction");
   }
   const paidByUserData = await getUser(serverId, paidByUser.id);
   if (paidByUserData === null || paidByUserData.data().active === false) {
@@ -104,7 +108,7 @@ export async function addTransaction(
   const paidForUserRefList = [];
   for (const user of paidForUserList) {
     if (user === null) {
-      throw new Error("Please input appropiate user for the transaction")
+      throw new Error("Please input appropiate user for the transaction");
     }
 
     const userData = await getUser(serverId, user.id);
