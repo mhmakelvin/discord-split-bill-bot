@@ -1,7 +1,7 @@
 import { db } from "../firebase/firebase.js";
 import { getUser } from "./user_service.js";
 
-export async function getTransaction(messageId) {
+export async function getTransactionByMessageId(messageId) {
   const txn = await db
     .collection("transactions")
     .where("messageId", "==", messageId)
@@ -12,6 +12,22 @@ export async function getTransaction(messageId) {
   }
 
   return txn.docs[0];
+}
+
+export async function getTransactionsByUser(serverId, userId) {
+  const userData = await getUser(serverId, userId);
+
+  if (userData === null) {
+    throw new Error(`User ${userId} not found`);
+  }
+
+  const txn = await db
+    .collection("transactions")
+    .where("serverId", "==", serverId)
+    .where("borrowers", "array-contains", userData.ref)
+    .get();
+
+  return txn.docs;
 }
 
 export async function getTransactionsPaidByUser(serverId, userId) {
@@ -37,7 +53,7 @@ export async function getTransactionsPaidForUser(serverId, userId) {
 }
 
 export async function cancelTransaction(messageId, userId) {
-  const txn = await getTransaction(messageId);
+  const txn = await getTransactionByMessageId(messageId);
 
   if (txn === null) {
     throw new Error(`Transaction with ${messageId} not found`);
@@ -148,7 +164,7 @@ export async function addTransaction(
 }
 
 export async function deleteTransaction(messageId) {
-  const txn = await getTransaction(messageId);
+  const txn = await getTransactionByMessageId(messageId);
 
   if (txn === null) return;
 
