@@ -14,22 +14,6 @@ export async function getTransactionByMessageId(messageId) {
   return txn.docs[0];
 }
 
-export async function getTransactionsByUser(serverId, userId) {
-  const userData = await getUser(serverId, userId);
-
-  if (userData === null) {
-    throw new Error(`User ${userId} not found`);
-  }
-
-  const txn = await db
-    .collection("transactions")
-    .where("serverId", "==", serverId)
-    .where("borrowers", "array-contains", userData.ref)
-    .get();
-
-  return txn.docs;
-}
-
 export async function getTransactionsPaidByUser(serverId, userId) {
   const userData = await getUser(serverId, userId);
 
