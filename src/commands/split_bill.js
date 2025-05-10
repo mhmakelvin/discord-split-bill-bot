@@ -46,7 +46,6 @@ export async function execute(interaction) {
   const serverId = interaction.commandGuildId;
   const payingUser =
     interaction.options.getMentionable("paid_by") || interaction.user;
-  console.log(payingUser);
 
   const isAuthorActive = await isActiveUser(serverId, interaction.user.id);
   if (!isAuthorActive) {
