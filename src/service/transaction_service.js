@@ -36,6 +36,7 @@ export async function getTransactionsByUser(serverId, userId) {
   return txn.docs;
 }
 
+/* Deprecated */
 export async function getTransactionsPaidByUser(serverId, userId) {
   const userData = await getUser(serverId, userId);
 
@@ -47,6 +48,7 @@ export async function getTransactionsPaidByUser(serverId, userId) {
   return txn.docs;
 }
 
+/* Deprecated */
 export async function getTransactionsPaidForUser(serverId, userId) {
   const userData = await getUser(serverId, userId);
 

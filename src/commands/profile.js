@@ -26,43 +26,6 @@ export async function execute(interaction) {
       );
     }
 
-    const debitTransactions = await getTransactionsPaidByUser(
-      interaction.commandGuildId,
-      user.id,
-    );
-    const creditTransactions = await getTransactionsPaidForUser(
-      interaction.commandGuildId,
-      user.id,
-    );
-
-    const balance = new Map();
-    for (const txn of debitTransactions) {
-      const txnData = txn.data();
-
-      if (txnData.isCancelled || !txnData.isApproved) {
-        continue;
-      }
-
-      balance.set(
-        txnData.currency,
-        (balance.get(txnData.currency) || 0) + txnData.amount,
-      );
-    }
-
-    for (const txn of creditTransactions) {
-      const txnData = txn.data();
-
-      if (txnData.isCancelled || !txnData.isApproved) {
-        continue;
-      }
-
-      const amount = txnData.amount / txnData.borrowers.length;
-      balance.set(
-        txnData.currency,
-        (balance.get(txnData.currency) || 0) - amount,
-      );
-    }
-
     const embed = new EmbedBuilder()
       .setTitle(`${userData.data().name}'s Profile`)
       .setFields(
@@ -74,7 +37,7 @@ export async function execute(interaction) {
         {
           name: "Balance",
 
-          value: Array.from(balance.entries())
+          value: Object.entries(userData.data().balance)
             .map(([currency, amount]) => `${currency}: ${amount}`)
             .join("\n"),
         },
