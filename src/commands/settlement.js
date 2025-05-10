@@ -72,7 +72,7 @@ export async function execute(interaction) {
     );
 
     msg.edit(
-      `Transaction request from ${fromUser} to ${toUser} for ${amount} ${currency}\n Please confirm by reacting with ${approvedEmoji}`,
+      `Transaction request from ${fromUser} to ${toUser} for ${amount} ${currency}\nPlease confirm by reacting with ${approvedEmoji}`,
     );
     msg.react(approvedEmoji);
     msg.pin();
