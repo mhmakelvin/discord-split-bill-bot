@@ -1,9 +1,13 @@
 import { EmbedBuilder } from "discord.js";
-import { getTransaction } from "./transaction_service.js";
+import {
+  approveTransaction,
+  processTransaction,
+  getTransactionByMessageId,
+} from "./transaction_service.js";
 import { approvedEmoji } from "../constants.js";
 
 export async function getMessageForTransactionId(client, messageId) {
-  const docRef = await getTransaction(messageId);
+  const docRef = await getTransactionByMessageId(messageId);
 
   if (docRef === null) {
     throw new Error(`Transaction with ${messageId} not found`);
@@ -23,7 +27,7 @@ export async function updateTransactionMessage(client, messageId) {
   try {
     const msg = await getMessageForTransactionId(client, messageId);
 
-    const txn = await getTransaction(messageId);
+    const txn = await getTransactionByMessageId(messageId);
     const txnData = txn.data();
 
     if (txnData.isApproved || txnData.isCancelled) return;
@@ -96,8 +100,13 @@ export async function updateTransactionMessage(client, messageId) {
 
     // If all users have approved, update the transaction status
     if (pendingUsers.length === 0) {
-      await txn.ref.update({ ...txnData, isApproved: true });
+      await approveTransaction(messageId);
       msg.edit({ content: "All users have approved the transaction." });
+
+      await processTransaction(messageId);
+      msg.edit({
+        content: `Transaction has been processed on ${new Date().toUTCString()}`,
+      });
       msg.unpin();
     }
   } catch (e) {

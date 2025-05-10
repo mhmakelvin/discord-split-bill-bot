@@ -1,3 +1,4 @@
+import { Filter } from "firebase-admin/firestore";
 import { db } from "../firebase/firebase.js";
 import { getUser } from "./user_service.js";
 
@@ -12,6 +13,27 @@ export async function getTransactionByMessageId(messageId) {
   }
 
   return txn.docs[0];
+}
+
+export async function getTransactionsByUser(serverId, userId) {
+  const userData = await getUser(serverId, userId);
+
+  if (userData === null) {
+    throw new Error(`User ${userId} not found`);
+  }
+
+  const txn = await db
+    .collection("transactions")
+    .where("serverId", "==", serverId)
+    .where(
+      Filter.or(
+        Filter.where("lender", "==", userData.ref),
+        Filter.where("borrowers", "array-contains", userData.ref),
+      ),
+    )
+    .get();
+
+  return txn.docs;
 }
 
 export async function getTransactionsPaidByUser(serverId, userId) {
@@ -153,4 +175,61 @@ export async function deleteTransaction(messageId) {
   if (txn === null) return;
 
   txn.ref.delete();
+}
+
+export async function approveTransaction(messageId) {
+  const txn = await getTransactionByMessageId(messageId);
+
+  if (txn === null) {
+    throw new Error(`Transaction with ${messageId} not found`);
+  }
+
+  await txn.ref.update({ isApproved: true });
+}
+
+export async function processTransaction(messageId) {
+  const txn = await getTransactionByMessageId(messageId);
+
+  if (txn === null) {
+    throw new Error(`Transaction with ${messageId} not found`);
+  }
+
+  const txnData = txn.data();
+
+  if (txnData.isCancelled || txnData.isProcessed) return;
+  if (!txnData.isApproved) return;
+
+  await db.runTransaction(async (firestoreTxn) => {
+    const lender = await firestoreTxn.get(txnData.lender);
+    const borrowers = await Promise.all(
+      txnData.borrowers.map((user) => firestoreTxn.get(user)),
+    );
+
+    const amountPerPerson = txnData.amount / txnData.borrowers.length;
+
+    const balanceChangeByUserId = {};
+    balanceChangeByUserId[lender.data().userId] = txnData.amount;
+    for (const borrower of borrowers) {
+      balanceChangeByUserId[borrower.data().userId] =
+        (balanceChangeByUserId[borrower.data().userId] || 0) - amountPerPerson;
+    }
+
+    const lenderBalance = lender.data().balance || {};
+    lenderBalance[txnData.currency] =
+      (lenderBalance[txnData.currency] || 0) +
+      balanceChangeByUserId[lender.data().userId];
+    firestoreTxn.update(lender.ref, { balance: lenderBalance });
+
+    for (const borrower of borrowers) {
+      const borrowerBalance = borrower.data().balance || {};
+      borrowerBalance[txnData.currency] =
+        (borrowerBalance[txnData.currency] || 0) +
+        balanceChangeByUserId[borrower.data().userId];
+      firestoreTxn.update(borrower.ref, { balance: borrowerBalance });
+    }
+
+    firestoreTxn.update(txn.ref, {
+      isProcessed: true,
+    });
+  });
 }
