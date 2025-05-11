@@ -2,6 +2,15 @@ import { Filter } from "firebase-admin/firestore";
 import { db } from "../firebase/firebase.js";
 import { getUser } from "./user_service.js";
 
+export async function getAllTransactionsByMessageId(messageId) {
+  const transactions = await db
+    .collection("transactions")
+    .where("messageId", "==", messageId)
+    .get();
+
+  return transactions;
+}
+
 export async function getTransactionByMessageId(messageId) {
   const txn = await db
     .collection("transactions")
@@ -180,58 +189,63 @@ export async function deleteTransaction(messageId) {
 }
 
 export async function approveTransaction(messageId) {
-  const txn = await getTransactionByMessageId(messageId);
+  const transactions = await getAllTransactionsByMessageId(messageId);
 
-  if (txn === null) {
+  if (transactions.length === 0) {
     throw new Error(`Transaction with ${messageId} not found`);
   }
 
-  await txn.ref.update({ isApproved: true });
+  for (const txn of transactions.docs) {
+    await txn.ref.update({ isApproved: true });
+  }
 }
 
 export async function processTransaction(messageId) {
-  const txn = await getTransactionByMessageId(messageId);
+  const transactions = await getAllTransactionsByMessageId(messageId);
 
-  if (txn === null) {
+  if (transactions.length === 0) {
     throw new Error(`Transaction with ${messageId} not found`);
   }
 
-  const txnData = txn.data();
+  for (const txn of transactions.docs) {
+    const txnData = txn.data();
 
-  if (txnData.isCancelled || txnData.isProcessed) return;
-  if (!txnData.isApproved) return;
+    if (txnData.isCancelled || txnData.isProcessed) return;
+    if (!txnData.isApproved) return;
 
-  await db.runTransaction(async (firestoreTxn) => {
-    const lender = await firestoreTxn.get(txnData.lender);
-    const borrowers = await Promise.all(
-      txnData.borrowers.map((user) => firestoreTxn.get(user)),
-    );
+    await db.runTransaction(async (firestoreTxn) => {
+      const lender = await firestoreTxn.get(txnData.lender);
+      const borrowers = await Promise.all(
+        txnData.borrowers.map((user) => firestoreTxn.get(user)),
+      );
 
-    const amountPerPerson = txnData.amount / txnData.borrowers.length;
+      const amountPerPerson = txnData.amount / txnData.borrowers.length;
 
-    const balanceChangeByUserId = {};
-    balanceChangeByUserId[lender.data().userId] = txnData.amount;
-    for (const borrower of borrowers) {
-      balanceChangeByUserId[borrower.data().userId] =
-        (balanceChangeByUserId[borrower.data().userId] || 0) - amountPerPerson;
-    }
+      const balanceChangeByUserId = {};
+      balanceChangeByUserId[lender.data().userId] = txnData.amount;
+      for (const borrower of borrowers) {
+        balanceChangeByUserId[borrower.data().userId] =
+          (balanceChangeByUserId[borrower.data().userId] || 0) -
+          amountPerPerson;
+      }
 
-    const lenderBalance = lender.data().balance || {};
-    lenderBalance[txnData.currency] =
-      (lenderBalance[txnData.currency] || 0) +
-      balanceChangeByUserId[lender.data().userId];
-    firestoreTxn.update(lender.ref, { balance: lenderBalance });
+      const lenderBalance = lender.data().balance || {};
+      lenderBalance[txnData.currency] =
+        (lenderBalance[txnData.currency] || 0) +
+        balanceChangeByUserId[lender.data().userId];
+      firestoreTxn.update(lender.ref, { balance: lenderBalance });
 
-    for (const borrower of borrowers) {
-      const borrowerBalance = borrower.data().balance || {};
-      borrowerBalance[txnData.currency] =
-        (borrowerBalance[txnData.currency] || 0) +
-        balanceChangeByUserId[borrower.data().userId];
-      firestoreTxn.update(borrower.ref, { balance: borrowerBalance });
-    }
+      for (const borrower of borrowers) {
+        const borrowerBalance = borrower.data().balance || {};
+        borrowerBalance[txnData.currency] =
+          (borrowerBalance[txnData.currency] || 0) +
+          balanceChangeByUserId[borrower.data().userId];
+        firestoreTxn.update(borrower.ref, { balance: borrowerBalance });
+      }
 
-    firestoreTxn.update(txn.ref, {
-      isProcessed: true,
+      firestoreTxn.update(txn.ref, {
+        isProcessed: true,
+      });
     });
-  });
+  }
 }
