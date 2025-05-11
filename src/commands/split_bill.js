@@ -9,6 +9,7 @@ import {
   addTransaction,
   deleteTransaction,
 } from "../service/transaction_service.js";
+import { createTransactionMessage } from "../service/message_service.js";
 import { approvedEmoji } from "../constants.js";
 
 const currencyOptions = [];
@@ -137,6 +138,7 @@ export async function execute(interaction) {
     txnMsg.edit(
       `${interaction.user} has initiated a transaction of ${amount} ${currency} splitting between ${mentionedUsers}\n Please confirm by reacting with ${approvedEmoji}`,
     );
+    await createTransactionMessage(interaction.client, txnMsg.id);
     txnMsg.react(approvedEmoji);
     txnMsg.pin();
 

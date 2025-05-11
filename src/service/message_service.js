@@ -23,7 +23,7 @@ export async function getMessageForTransactionId(client, messageId) {
   } catch (e) {}
 }
 
-export async function updateTransactionMessage(client, messageId) {
+export async function createTransactionMessage(client, messageId) {
   try {
     const msg = await getMessageForTransactionId(client, messageId);
 
@@ -33,6 +33,69 @@ export async function updateTransactionMessage(client, messageId) {
     if (txnData.isApproved || txnData.isCancelled) return;
 
     const author = (await txnData.author.get()).data();
+    const lender = (await txnData.lender.get()).data();
+    const borrowers = (
+      await Promise.all(txnData.borrowers.map((user) => user.get()))
+    ).map((ref) => ref.data());
+
+    let pendingUsers = [];
+
+    pendingUsers.push(lender.name);
+
+    for (const borrower of borrowers) {
+      pendingUsers.push(borrower.name);
+    }
+
+    pendingUsers = [...new Set(pendingUsers)];
+
+    const amountPerPerson = txnData.amount / txnData.borrowers.length;
+
+    const embed = new EmbedBuilder()
+      .setTitle(txnData.description || "Transaction Request")
+      .setAuthor({ name: author.name })
+      .setFields(
+        { name: "Transaction ID", value: msg.id },
+        {
+          name: "Paid by",
+          value: lender.name,
+        },
+        {
+          name: "Paid to",
+          value: borrowers.map((user) => user.name).join(", "),
+        },
+        {
+          name: "Amount",
+          value: `${txnData.amount} ${txnData.currency} (${amountPerPerson} ${txnData.currency} per person)`,
+        },
+        {
+          name: "Approved",
+          value: `0`,
+        },
+        {
+          name: "Pending Approval",
+          value: `${pendingUsers.length} ${
+            pendingUsers.length > 0 ? "(" + pendingUsers.join(", ") + ")" : ""
+          }`,
+        },
+        { name: "Last Updated", value: new Date().toUTCString() },
+      )
+      .setTimestamp();
+
+    await msg.edit({ embeds: [embed] });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function updateTransactionMessageOnReaction(client, messageId) {
+  try {
+    const msg = await getMessageForTransactionId(client, messageId);
+
+    const txn = await getTransactionByMessageId(messageId);
+    const txnData = txn.data();
+
+    if (txnData.isApproved || txnData.isCancelled) return;
+
     const lender = (await txnData.lender.get()).data();
     const borrowers = (
       await Promise.all(txnData.borrowers.map((user) => user.get()))
@@ -61,42 +124,16 @@ export async function updateTransactionMessage(client, messageId) {
     approvedUsers = [...new Set(approvedUsers)];
     pendingUsers = [...new Set(pendingUsers)];
 
-    const amountPerPerson = txnData.amount / txnData.borrowers.length;
-
-    const embed = new EmbedBuilder()
-      .setTitle(txnData.description || "Transaction Request")
-      .setAuthor({ name: author.name })
-      .setFields(
-        { name: "Transaction ID", value: msg.id },
-        {
-          name: "Paid by",
-          value: lender.name,
-        },
-        {
-          name: "Paid to",
-          value: borrowers.map((user) => user.name).join(", "),
-        },
-        {
-          name: "Amount",
-          value: `${txnData.amount} ${txnData.currency} (${amountPerPerson} ${txnData.currency} per person)`,
-        },
-        {
-          name: "Approved",
-          value: `${approvedUsers.length} ${
-            approvedUsers.length > 0 ? "(" + approvedUsers.join(", ") + ")" : ""
-          }`,
-        },
-        {
-          name: "Pending Approval",
-          value: `${pendingUsers.length} ${
-            pendingUsers.length > 0 ? "(" + pendingUsers.join(", ") + ")" : ""
-          }`,
-        },
-        { name: "Last Updated", value: new Date().toUTCString() },
-      )
-      .setTimestamp();
-
-    await msg.edit({ embeds: [embed] });
+    const embed = msg.embeds[0];
+    embed.fields.find((f) => f.name === "Approved").value =
+      `${approvedUsers.length} ${
+        approvedUsers.length > 0 ? "(" + approvedUsers.join(", ") + ")" : ""
+      }`;
+    embed.fields.find((f) => f.name === "Pending Approval").value =
+      `${pendingUsers.length} ${
+        pendingUsers.length > 0 ? "(" + pendingUsers.join(", ") + ")" : ""
+      }`;
+    msg.edit({ embeds: [embed] });
 
     // If all users have approved, update the transaction status
     if (pendingUsers.length === 0) {

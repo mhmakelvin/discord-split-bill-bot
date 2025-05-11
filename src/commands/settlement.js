@@ -4,6 +4,7 @@ import {
   addTransaction,
   deleteTransaction,
 } from "../service/transaction_service.js";
+import { createTransactionMessage } from "../service/message_service.js";
 import { approvedEmoji } from "../constants.js";
 
 const currencyOptions = [];
@@ -74,6 +75,7 @@ export async function execute(interaction) {
     msg.edit(
       `Transaction request from ${fromUser} to ${toUser} for ${amount} ${currency}\nPlease confirm by reacting with ${approvedEmoji}`,
     );
+    await createTransactionMessage(interaction.client, msg.id);
     msg.react(approvedEmoji);
     msg.pin();
   } catch (e) {

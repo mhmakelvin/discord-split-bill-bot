@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as Discord from "discord.js";
 import { discordConfig } from "../config.js";
-import { updateTransactionMessage } from "./service/message_service.js";
+import { updateTransactionMessageOnReaction } from "./service/message_service.js";
 
 const client = new Discord.Client({
   intents: [
@@ -65,11 +65,11 @@ client.on(Discord.Events.InteractionCreate, async (interaction) => {
 });
 
 client.on(Discord.Events.MessageReactionAdd, async (reaction, user) => {
-  updateTransactionMessage(client, reaction.message.id);
+  updateTransactionMessageOnReaction(client, reaction.message.id);
 });
 
 client.on(Discord.Events.MessageReactionRemove, async (reaction, user) => {
-  updateTransactionMessage(client, reaction.message.id);
+  updateTransactionMessageOnReaction(client, reaction.message.id);
 });
 
 client.login(discordConfig.token);
