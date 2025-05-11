@@ -3,6 +3,7 @@ import * as path from "path";
 import * as Discord from "discord.js";
 import { discordConfig } from "../config.js";
 import { updateTransactionMessageOnReaction } from "./service/message_service.js";
+import { registerProcessApprovedTransactionsCronJob } from "./cron/process_approved_transactions.js";
 
 const client = new Discord.Client({
   intents: [
@@ -73,3 +74,6 @@ client.on(Discord.Events.MessageReactionRemove, async (reaction, user) => {
 });
 
 client.login(discordConfig.token);
+
+// Register cron jobs
+registerProcessApprovedTransactionsCronJob(discordConfig.guildId);

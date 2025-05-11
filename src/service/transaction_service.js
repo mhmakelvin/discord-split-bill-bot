@@ -46,14 +46,20 @@ export async function getTransactionsByUser(serverId, userId) {
 }
 
 export async function getUnprocessApprovedTransactions(serverId) {
-  const txn = await db
+  const approvedTransactions = await db
     .collection("transactions")
     .where("serverId", "==", serverId)
     .where("isApproved", "==", true)
-    .where("isProcessed", "==", false)
     .get();
 
-  return txn.docs;
+  const unprocessedTransactions = [];
+  approvedTransactions.forEach((txn) => {
+    if (!txn.data().isProcessed) {
+      unprocessedTransactions.push(txn);
+    }
+  });
+
+  return unprocessedTransactions;
 }
 
 export async function cancelTransaction(messageId, userId) {
