@@ -45,29 +45,6 @@ export async function getTransactionsByUser(serverId, userId) {
   return txn.docs;
 }
 
-/* Deprecated */
-export async function getTransactionsPaidByUser(serverId, userId) {
-  const userData = await getUser(serverId, userId);
-
-  const txn = await db
-    .collection("transactions")
-    .where("lender", "==", userData.ref)
-    .get();
-
-  return txn.docs;
-}
-
-/* Deprecated */
-export async function getTransactionsPaidForUser(serverId, userId) {
-  const userData = await getUser(serverId, userId);
-
-  const txn = await db
-    .collection("transactions")
-    .where("borrowers", "array-contains", userData.ref)
-    .get();
-
-  return txn.docs;
-}
 
 export async function cancelTransaction(messageId, userId) {
   const txn = await getTransactionByMessageId(messageId);
@@ -111,14 +88,12 @@ export async function addTransaction(
     throw new Error(
       "Invalid description. Please try not to use mentionable as display name",
     );
-    return;
   }
 
   if (description === "@here" || description === "@everyone") {
     throw new Error(
       "Invalid description. Please try not to use mentionable as display name",
     );
-    return;
   }
 
   const inactiveUserList = [];
