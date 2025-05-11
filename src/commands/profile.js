@@ -1,8 +1,4 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
-import {
-  getTransactionsPaidByUser,
-  getTransactionsPaidForUser,
-} from "../service/transaction_service.js";
 import { getUser } from "../service/user_service.js";
 
 export const data = new SlashCommandBuilder()
