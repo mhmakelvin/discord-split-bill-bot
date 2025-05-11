@@ -8,7 +8,7 @@ export async function getAllTransactionsByMessageId(messageId) {
     .where("messageId", "==", messageId)
     .get();
 
-  return transactions;
+  return transactions.docs;
 }
 
 export async function getTransactionByMessageId(messageId) {
@@ -45,6 +45,16 @@ export async function getTransactionsByUser(serverId, userId) {
   return txn.docs;
 }
 
+export async function getUnprocessApprovedTransactions(serverId) {
+  const txn = await db
+    .collection("transactions")
+    .where("serverId", "==", serverId)
+    .where("isApproved", "==", true)
+    .where("isProcessed", "==", false)
+    .get();
+
+  return txn.docs;
+}
 
 export async function cancelTransaction(messageId, userId) {
   const txn = await getTransactionByMessageId(messageId);
@@ -170,7 +180,7 @@ export async function approveTransaction(messageId) {
     throw new Error(`Transaction with ${messageId} not found`);
   }
 
-  for (const txn of transactions.docs) {
+  for (const txn of transactions) {
     await txn.ref.update({ isApproved: true });
   }
 }
@@ -182,7 +192,7 @@ export async function processTransaction(messageId) {
     throw new Error(`Transaction with ${messageId} not found`);
   }
 
-  for (const txn of transactions.docs) {
+  for (const txn of transactions) {
     const txnData = txn.data();
 
     if (txnData.isCancelled || txnData.isProcessed) return;
