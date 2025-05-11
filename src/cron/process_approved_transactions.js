@@ -1,10 +1,10 @@
-import cron from "node-cron";
+import { CronJob } from "cron";
 import {
   processTransaction,
   getUnprocessApprovedTransactions,
 } from "../service/transaction_service.js";
 
-const schedule = "0 */15 * * * *"; 
+const schedule = "0 */15 * * * *";
 
 async function processApprovedTransactions(serverId) {
   const processedTransactions = [];
@@ -38,5 +38,9 @@ async function processApprovedTransactions(serverId) {
 }
 
 export function registerProcessApprovedTransactionsCronJob(serverId) {
-  cron.schedule(schedule, async () => await processApprovedTransactions(serverId));
+  const job = new CronJob(schedule, () =>
+    processApprovedTransactions(serverId),
+  );
+
+  job.start();
 }
