@@ -32,8 +32,7 @@ export async function execute(interaction) {
         },
         {
           name: "Balance",
-
-          value: Object.entries(userData.data().balance)
+          value: Object.entries(userData.data().balance || {})
             .map(([currency, amount]) => `${currency}: ${amount}`)
             .join("\n"),
         },
