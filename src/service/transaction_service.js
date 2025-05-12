@@ -172,11 +172,11 @@ export async function addTransaction(
 }
 
 export async function deleteTransaction(messageId) {
-  const txn = await getTransactionByMessageId(messageId);
+  const transactions = await getAllTransactionsByMessageId(messageId);
 
-  if (txn === null) return;
-
-  txn.ref.delete();
+  for (const txn of transactions) {
+    txn.ref.delete();
+  }
 }
 
 export async function approveTransaction(messageId) {
