@@ -8,10 +8,11 @@ export async function execute(interaction) {
   await interaction.reply({
     content: codeBlock(
       "/activate {name} - Starting using Split Bill Bot\n\n" +
-        "/payment {from} {to} {amount} {currency} - Create a payment transaction between 2 users\n\n" +
-        "/split_bill {amount} {currency} - Create a transction that split bill between @mentioned users\n\n" +
+        "/settlement {from} {to} {amount} {currency} - Create a transaction representing from_user giving money to to_user \n\n" +
+        "/split_bill {amount} {currency} {description} {paid_by} - Create a transction that split bill between @mentioned users\n\n" +
         "/cancel {transaction_id} - Cancel transaction with specific ID\n\n" +
-        "/profile - Get your information",
+        "/remind {user} - Reminding someone for unapproved transactions\n\n" +
+        "/profile {user} - Get information",
     ),
     ephemeral: true,
   });
