@@ -102,13 +102,7 @@ export async function addTransaction(
 
   if (/^.*\<((@(&)?)|#)[0-9]+\>.*$/.test(description)) {
     throw new Error(
-      "Invalid description. Please try not to use mentionable as display name",
-    );
-  }
-
-  if (description === "@here" || description === "@everyone") {
-    throw new Error(
-      "Invalid description. Please try not to use mentionable as display name",
+      "Invalid description. Please try not to use mentionable as description",
     );
   }
 
